@@ -916,23 +916,63 @@ def solve_full_variant(
 
 
 def tab_variant(alphabet: dict) -> None:
-    st.header("📝 Вариант 1 — полное решение")
-    st.markdown(
-        "Параметры варианта из контрольной:\n"
-        "- **RSA:** $p=31,\\ q=23,\\ e=7$, открытый текст **RAIN**, шифртекст $(128,333,333,168)$\n"
-        "- **Эль-Гамаль:** $p=37,\\ g=2,\\ y=17$, хэш-параметры $p_{hash}=13,\\ r=5$, "
-        "подпись сообщения **RAIN**, $k=11$\n"
-        "- **Верификация:** сообщение **BOOK**, подпись $(R_{ver},S_{ver}) = (13, 25)$"
-    )
+    st.header("📝 Вариант — полное решение")
+
+    with st.expander("⚙️ Задача 1–2: RSA", expanded=True):
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            rsa_p = st.number_input("p", value=31, step=1, key="v_rsa_p")
+        with col2:
+            rsa_q = st.number_input("q", value=23, step=1, key="v_rsa_q")
+        with col3:
+            rsa_e = st.number_input("e", value=7, step=1, key="v_rsa_e")
+        plaintext = st.text_input("Открытый текст (шифрование)", value="RAIN", key="v_plain")
+        ciphertext_raw = st.text_input(
+            "Шифртекст для расшифрования (через запятую)", value="128,333,333,168", key="v_cipher"
+        )
+
+    with st.expander("⚙️ Задача 3: ЭЦП Эль-Гамаль", expanded=True):
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            eg_p = st.number_input("p (ЭГ)", value=37, step=1, key="v_eg_p")
+        with col2:
+            eg_g = st.number_input("g (ЭГ)", value=2, step=1, key="v_eg_g")
+        with col3:
+            eg_y = st.number_input("y (ЭГ)", value=17, step=1, key="v_eg_y")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            p_hash = st.number_input("p_hash", value=13, step=1, key="v_ph")
+            r_hash = st.number_input("r (хэш)", value=5, step=1, key="v_rh")
+        with col2:
+            k_sig = st.number_input("k (сессионный)", value=11, step=1, key="v_ksig")
+        with col3:
+            sig_msg = st.text_input("Сообщение для подписи", value="RAIN", key="v_smsg")
+
+    with st.expander("⚙️ Верификация", expanded=True):
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            ver_msg = st.text_input("Сообщение", value="BOOK", key="v_vmsg")
+        with col2:
+            R_ver = st.number_input("R_ver", value=13, step=1, key="v_rver")
+        with col3:
+            S_ver = st.number_input("S_ver", value=25, step=1, key="v_sver")
+
     if st.button("🚀 Решить вариант целиком", type="primary", key="solve_v1"):
+        try:
+            ciphertext = [int(x.strip()) for x in ciphertext_raw.split(",")]
+        except ValueError:
+            st.error("Шифртекст: введите целые числа через запятую.")
+            return
+
         solve_full_variant(
             alphabet,
-            rsa_p=31, rsa_q=23, rsa_e=7,
-            plaintext="RAIN", ciphertext=[128, 333, 333, 168],
-            eg_p=37, eg_g=2, eg_y=17,
-            sig_msg="RAIN", p_hash=13, r_hash=5, k_sig=11,
-            ver_msg="BOOK", R_ver=13, S_ver=25,
+            rsa_p=int(rsa_p), rsa_q=int(rsa_q), rsa_e=int(rsa_e),
+            plaintext=plaintext, ciphertext=ciphertext,
+            eg_p=int(eg_p), eg_g=int(eg_g), eg_y=int(eg_y),
+            sig_msg=sig_msg, p_hash=int(p_hash), r_hash=int(r_hash), k_sig=int(k_sig),
+            ver_msg=ver_msg, R_ver=int(R_ver), S_ver=int(S_ver),
         )
+
 
 
 def main() -> None:
